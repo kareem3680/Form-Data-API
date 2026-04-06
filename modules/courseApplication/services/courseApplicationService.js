@@ -9,6 +9,20 @@ import { sanitizeCourseApplication } from "../../../utils/sanitizeData.js";
 const logger = new Logger("courseApplication");
 
 // ============================================================
+// UTILS: Simple Markdown to lightweight HTML
+// ============================================================
+function markdownToHtml(text = "") {
+  let html = text
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // bold
+    .replace(/^- (.*)$/gm, "<li>$1</li>"); // lists
+
+  if (html.includes("<li>")) html = `<ul>${html}</ul>`;
+  html = html.replace(/\n/g, "<br/>");
+
+  return html;
+}
+
+// ============================================================
 // CREATE COURSE REGISTRATION
 // ============================================================
 export const createCourseApplicationService = asyncHandler(async (req) => {
@@ -27,32 +41,29 @@ export const createCourseApplicationService = asyncHandler(async (req) => {
     notes,
   });
 
-  // Send confirmation email in Arabic
+  // Prepare email content (lightweight & clean)
+  const messageContent = `
+Hello ${fullName},
+
+Thank you for registering in the Frontend Engineer Crash Course by YouTurkeyTech.
+
+In this course, you will learn:
+- Web development fundamentals
+- Modern frontend technologies
+- How to build real-world projects for your portfolio
+- Best practices for jobs or freelancing
+
+Our team will contact you soon with full details about the schedule and attendance.
+
+Best regards,  
+YouTurkeyTech Team
+  `.trim();
+
+  // Send confirmation email asynchronously (fire-and-forget)
   sendEmail({
     email,
-    subject: `تأكيد التسجيل في كورس Frontend Engineer Crash Course`,
-    message: `
-مرحبًا عزيزي/عزيزتي ${fullName}،
-
-نشكرك على تسجيلك في كورس **Frontend Engineer Crash Course** المقدم من أكاديمية **YouTurkeyTech**.
-
-يسعدنا انضمامك إلينا، ونتطلع لمساعدتك في تطوير مهاراتك في مجال تطوير الواجهات الأمامية (Frontend) والوصول إلى أهدافك المهنية.
-
-خلال هذا الكورس، ستتعلم:
-- أساسيات تطوير الويب بشكل احترافي
-- تقنيات Frontend الحديثة المطلوبة في سوق العمل
-- كيفية بناء مشاريع عملية تضيفها إلى معرض أعمالك (Portfolio)
-- أفضل الممارسات التي تؤهلك للحصول على فرص عمل أو بدء العمل الحر
-
-سيقوم فريقنا بالتواصل معك قريبًا لتأكيد التفاصيل الكاملة الخاصة بموعد بدء الكورس وطريقة الحضور.
-
-إذا كان لديك أي استفسار، لا تتردد في التواصل معنا في أي وقت.
-
-نتمنى لك رحلة تعليمية ممتعة ومثمرة 
-
-مع أطيب التحيات،
-فريق أكاديمية YouTurkeyTech
-    `.trim(),
+    subject: "Frontend Engineer Crash Course Registration Confirmation",
+    message: messageContent,
   }).catch((err) =>
     logger.error("Email sending failed", { error: err.message }),
   );
@@ -60,6 +71,7 @@ export const createCourseApplicationService = asyncHandler(async (req) => {
   await logger.info(
     `New course registration submitted by ${fullName} (${email})`,
   );
+
   return sanitizeCourseApplication(application);
 });
 
@@ -77,7 +89,6 @@ export const getAllCourseApplicationsService = asyncHandler(async (req) => {
     },
   );
 
-  // Sanitize all returned applications
   result.data = result.data.map((app) => sanitizeCourseApplication(app));
 
   await logger.info(`Loaded ${result.results} course registrations`);

@@ -29,7 +29,7 @@ applySecurity(app);
 app.use(
   cors({
     origin: "*",
-  })
+  }),
 );
 
 // Dev logging
@@ -41,7 +41,7 @@ mountRoutes(app);
 // Welcome route
 app.get("/", (req, res) => {
   res.status(200).json({
-    message: "Welcome to Akhdar-ERP Back-End API 🚀",
+    message: "Welcome to YouTurkeyTech Back-End API 🚀",
   });
 });
 
