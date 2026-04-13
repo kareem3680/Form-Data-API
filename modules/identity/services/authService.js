@@ -35,11 +35,11 @@ export const registerUser = asyncHandler(async (userData, req) => {
 
   sendEmail({
     email: user.email,
-    subject: "Welcome to Styles Dispatch",
+    subject: "Welcome to YouTurkeyTech",
     message:
       "Your account has been successfully created!\nThank you for joining us.",
   }).catch((err) =>
-    logger.error("Email sending failed", { error: err.message })
+    logger.error("Email sending failed", { error: err.message }),
   );
 
   await logger.info("User registered successfully", { email: user.email });
@@ -62,7 +62,7 @@ export const loginUser = asyncHandler(async (email, password) => {
     await logger.error("Login failed - account deactivated", { email });
     throw new ApiError(
       "🛑 Your account has been deactivated. Please contact support.",
-      403
+      403,
     );
   }
 

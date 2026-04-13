@@ -28,11 +28,11 @@ export const createUserService = asyncHandler(async (body) => {
 
   sendEmail({
     email: newUser.email,
-    subject: "Welcome to Styles Dispatch",
+    subject: "Welcome to YouTurkeyTech",
     message:
       "Your account has been successfully created!\nThank you for joining us.",
   }).catch((err) =>
-    logger.error("Email sending failed", { error: err.message })
+    logger.error("Email sending failed", { error: err.message }),
   );
 
   await logger.info("User created", { userId: newUser._id });
@@ -104,14 +104,14 @@ export const updateUserRoleService = asyncHandler(
 
     await logger.info("User role updated", { id, role });
     return sanitizeUser(user);
-  }
+  },
 );
 
 export const deactivateUserService = asyncHandler(async (id) => {
   const user = await userModel.findByIdAndUpdate(
     id,
     { active: false },
-    { new: true }
+    { new: true },
   );
 
   if (!user) {
@@ -126,7 +126,7 @@ export const activateUserService = asyncHandler(async (id) => {
   const user = await userModel.findByIdAndUpdate(
     id,
     { active: true },
-    { new: true }
+    { new: true },
   );
 
   if (!user) {
